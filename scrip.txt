@@ -1,0 +1,96 @@
+1. Create Tablespace
+
+Create a tablespace called "COURSES" with one datafile of 50Mb, the name of the datafile should be: courses1.dbf
+
+
+CREATE TABLESPACE COURSES DATAFILE 
+'courses1.dbf' SIZE 50M
+AUTOEXTEND ON NEXT 100K MAXSIZE 500M
+EXTENT MANAGEMENT LOCAL 
+SEGMENT SPACE MANAGEMENT AUTO
+ONLINE;
+
+
+
+
+2. Create profile
+
+Create a profile named "administrativo" with the following specifications: 
+a) Idle time of 25 minutes 
+b) Failed login attempts 4 
+c) Onle one session per user
+
+CREATE PROFILE administrativo LIMIT
+SESSIONS_PER_USER 1
+CPU_PER_SESSION UNLIMITED
+CPU_PER_CALL UNLIMITED
+CONNECT_TIME 240
+IDLE_TIME 25
+PRIVATE_SGA 20 M
+FAILED_LOGIN_ATTEMPTS 4
+PASSWORD_LIFE_TIME 40
+PASSWORD_REUSE_MAX 4
+PASSWORD_LOCK_TIME 1
+PASSWORD_GRACE_TIME 2;
+
+
+
+3. Create user
+
+Create an user named with your github's username (In my case would be amartinezg) with only 30Mb of space on tablespace, the profile should be "administrativo"
+
+CREATE USER Machuca15 IDENTIFIED BY Machuca15
+DEFAULT TABLESPACE  COURSES
+PROFILE administrativo;
+GRANT WITHOUT_PRIVILEGES TO Machuca15;
+
+4. Setting up user
+
+your user should be able to log in and have DBA privileges
+GRANT DBA TO Machuca15;
+GRANT CONNECT, RESOURCE TO Machuca15;
+
+
+
+
+5. Create 4 tables (LOG IN WITH YOUR USER!!!!!):
+
+COURSES(id, name, code, date_start, date_end) STUDENTS(id, first_name, last_name, date_of_birth, city, address) ATTENDANCE(id, student_id, course_id, attendance_date) ANSWERS(id, number_of_question, answer)
+
+
+CREATE TABLE COURSES(
+id int primary key not null,
+name varchar2(255),
+code varchar2(255),
+date_start date,
+date_end date)
+
+CREATE TABLE STUDENTS(
+id int primary key not null,
+first_name varchar2(255),
+last_name varchar2(255),
+date_of_birth date,
+city varchar2(255),
+address varchar2(255))
+
+CREATE TABLE ATTENDANCE(
+id int primary key not null,
+student_id int,
+course_id int,
+attendance_date date)
+
+CREATE TABLE ANSWERS (
+id int primary key not null,
+number_of_question varchar2(255),
+answer varchar2(255) )
+
+alter table ATTENDANCE
+ add constraint FK_course_id
+  foreign key (course_id)
+  references COURSES(course_id);
+  
+  
+  alter table ATTENDANCE
+ add constraint FK_student_id
+  foreign key (student_id)
+  references STUDENTS(id);
